@@ -1,0 +1,665 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>PolicyAI — HR Document Assistant</title>
+
+<!-- ============================================================
+  CONFIG — Edit for any client document
+  ============================================================ -->
+<script>
+const CONFIG = {
+  // Branding
+  appName: "PolicyAI",
+  companyName: "Horizons Tech",
+  documentTitle: "Employee Handbook 2025",
+  documentPages: "42 pages",
+
+  // Colors
+  colorPrimary: "#0d1f3c",
+  colorAccent: "#f06a00",
+  colorBg: "#f4f6fa",
+
+  // Groq
+  groqApiKey: "YOUR_GROQ_API_KEY_HERE",
+  groqModel: "llama-3.1-8b-instant",
+
+  welcomeMessage: "I've read the Horizons Tech Employee Handbook 2025. Ask me anything about leave policies, code of conduct, benefits, work hours, or disciplinary procedures.",
+
+  suggestions: [
+    "How many annual leave days do I get?",
+    "What is the remote work policy?",
+    "How does the performance review work?",
+    "What are the medical benefits?"
+  ],
+
+  // Simulated document knowledge base (replaces real RAG for demo)
+  knowledgeBase: `
+You are PolicyAI, an intelligent HR document assistant for Horizons Tech. You have fully read and indexed the "Employee Handbook 2025" (42 pages). Answer questions accurately and cite the relevant policy section when possible.
+
+---
+DOCUMENT: Horizons Tech Employee Handbook 2025
+
+SECTION 1 — EMPLOYMENT BASICS
+- Office hours: 9:00 AM – 6:00 PM, Monday to Friday
+- Probation period: 3 months for all new hires
+- Notice period: 1 month (employee), 2 months (company)
+- Dress code: Business casual Monday–Thursday, casual Friday
+- ID cards must be worn on premises at all times
+
+SECTION 2 — LEAVE POLICY
+- Annual Leave: 18 days per year (accrued monthly at 1.5 days/month)
+- Sick Leave: 10 days per year (requires medical certificate for 3+ consecutive days)
+- Casual Leave: 6 days per year (max 2 consecutive days, no carry-forward)
+- Maternity Leave: 16 weeks fully paid
+- Paternity Leave: 2 weeks fully paid
+- Bereavement Leave: 5 days for immediate family, 2 days for extended family
+- Leave requests must be submitted at least 3 days in advance via the HR portal
+- Unused annual leave (up to 10 days) can be carried forward to the next year
+
+SECTION 3 — REMOTE WORK POLICY
+- Employees may work remotely up to 2 days per week after completing probation
+- Remote work days must be approved by the line manager by end of Thursday
+- Core hours during remote work: 10:00 AM – 4:00 PM (must be reachable)
+- Full remote work requires VP-level approval and is granted case-by-case
+- Internet allowance: PKR 3,000/month for approved remote employees
+
+SECTION 4 — COMPENSATION & BENEFITS
+- Salaries are paid on the 28th of each month
+- Annual increment: performance-based, reviewed every December
+- Medical Insurance: Coverage up to PKR 500,000/year per employee (family plan available for PKR 2,500/month extra)
+- Provident Fund: 8% of basic salary, company matches 8%
+- Annual bonus: up to 1 month salary based on performance rating
+- Fuel allowance: Grade C and above — PKR 8,000/month
+- Mobile allowance: Grade B and above — PKR 3,000/month
+
+SECTION 5 — PERFORMANCE MANAGEMENT
+- Annual performance review: December each year
+- Mid-year check-in: June
+- Ratings: Outstanding (5), Exceeds Expectations (4), Meets Expectations (3), Needs Improvement (2), Unsatisfactory (1)
+- Employees rated 1 are placed on a 60-day Performance Improvement Plan (PIP)
+- Promotion consideration requires rating of 4+ for two consecutive years
+
+SECTION 6 — CODE OF CONDUCT
+- Zero tolerance for harassment, discrimination, or bullying
+- Confidential reporting via hr@horizonstech.pk or anonymous hotline: 0800-HORIZON
+- Conflicts of interest must be disclosed to HR within 7 days of arising
+- Use of company equipment for personal business is prohibited
+- Social media posts that disparage the company or colleagues are grounds for disciplinary action
+
+SECTION 7 — DISCIPLINARY PROCEDURE
+- Step 1: Verbal warning (documented)
+- Step 2: Written warning
+- Step 3: Final written warning
+- Step 4: Termination
+- Gross misconduct (theft, fraud, violence) may result in immediate termination without prior steps
+- Employees may appeal any disciplinary decision within 10 working days
+
+SECTION 8 — IT & EQUIPMENT
+- Laptops issued on Day 1, must be returned on last working day
+- All company data must be stored on company-approved cloud (Google Drive)
+- Personal USB drives are prohibited on company machines
+- IT support: it@horizonstech.pk | Ext. 204
+
+CONTACT:
+- HR Department: hr@horizonstech.pk | Ext. 101
+- HR Manager: Ms. Ayesha Noor
+---
+
+Always cite the relevant section (e.g., "According to Section 2 — Leave Policy..."). Be professional, clear, and concise. If a question is outside the document's scope, say so politely and direct the employee to hr@horizonstech.pk.
+  `
+};
+</script>
+<!-- ============================================================ -->
+
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=IBM+Plex+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --primary: #0d1f3c;
+    --accent: #f06a00;
+    --bg: #f4f6fa;
+    --surface: #ffffff;
+    --text: #111827;
+    --text-muted: #6b7280;
+    --border: #e5e9f0;
+    --radius: 14px;
+  }
+
+  body {
+    font-family: 'IBM Plex Sans', sans-serif;
+    background: var(--bg);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 24px 16px;
+    background-image:
+      radial-gradient(ellipse 80% 40% at 50% 0%, rgba(13,31,60,0.07) 0%, transparent 70%);
+  }
+
+  /* ── App Header ── */
+  .app-header {
+    width: 100%;
+    max-width: 520px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 12px;
+    padding: 0 4px;
+  }
+
+  .app-logo {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .app-logo-mark {
+    width: 32px; height: 32px;
+    background: var(--primary);
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: 13px;
+    color: var(--accent);
+    letter-spacing: -0.03em;
+  }
+
+  .app-logo-name {
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 16px;
+    color: var(--primary);
+    letter-spacing: -0.02em;
+  }
+
+  .app-badge {
+    font-size: 10px;
+    font-weight: 500;
+    background: #fff3e8;
+    color: var(--accent);
+    border: 1px solid rgba(240,106,0,0.2);
+    padding: 3px 10px;
+    border-radius: 20px;
+    letter-spacing: 0.04em;
+  }
+
+  /* ── Document Card ── */
+  .doc-card {
+    width: 100%;
+    max-width: 520px;
+    background: var(--primary);
+    border-radius: var(--radius) var(--radius) 0 0;
+    padding: 16px 20px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .doc-card::after {
+    content: '';
+    position: absolute;
+    right: -20px; top: -20px;
+    width: 120px; height: 120px;
+    background: rgba(240,106,0,0.08);
+    border-radius: 50%;
+    pointer-events: none;
+  }
+
+  .pdf-icon {
+    width: 44px; height: 52px;
+    background: var(--accent);
+    border-radius: 6px 6px 6px 6px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    position: relative;
+    box-shadow: 0 4px 12px rgba(240,106,0,0.35);
+  }
+
+  .pdf-icon::before {
+    content: 'PDF';
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: 10px;
+    color: #fff;
+    letter-spacing: 0.05em;
+  }
+
+  .pdf-icon::after {
+    content: '';
+    position: absolute;
+    top: -1px; right: -1px;
+    width: 10px; height: 10px;
+    background: var(--primary);
+    border-radius: 0 0 0 6px;
+  }
+
+  .doc-info h2 {
+    font-family: 'Syne', sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+    color: #fff;
+    letter-spacing: -0.01em;
+  }
+
+  .doc-meta {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 5px;
+  }
+
+  .doc-meta span {
+    font-size: 11px;
+    color: rgba(255,255,255,0.45);
+    font-weight: 300;
+  }
+
+  .doc-meta .indexed {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 11px;
+    color: #6bdb8a;
+    font-weight: 500;
+  }
+
+  .doc-meta .indexed::before {
+    content: '✓';
+    font-size: 10px;
+  }
+
+  .rag-chip {
+    margin-left: auto;
+    background: rgba(240,106,0,0.15);
+    border: 1px solid rgba(240,106,0,0.3);
+    color: #ffb07a;
+    font-size: 10px;
+    font-family: 'Syne', sans-serif;
+    font-weight: 600;
+    padding: 4px 10px;
+    border-radius: 6px;
+    letter-spacing: 0.06em;
+    flex-shrink: 0;
+  }
+
+  /* ── Chat Window ── */
+  .chat-window {
+    width: 100%;
+    max-width: 520px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-top: none;
+    border-radius: 0 0 var(--radius) var(--radius);
+    display: flex;
+    flex-direction: column;
+    height: 520px;
+    overflow: hidden;
+    box-shadow: 0 12px 40px rgba(13,31,60,0.10);
+  }
+
+  /* ── Messages ── */
+  .messages {
+    flex: 1;
+    overflow-y: auto;
+    padding: 20px 18px 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    scroll-behavior: smooth;
+  }
+
+  .messages::-webkit-scrollbar { width: 3px; }
+  .messages::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+
+  .msg {
+    display: flex;
+    gap: 10px;
+    max-width: 92%;
+    animation: fadeUp 0.25s ease;
+  }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(7px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .msg.user { align-self: flex-end; flex-direction: row-reverse; }
+  .msg.bot  { align-self: flex-start; }
+
+  .avatar {
+    width: 28px; height: 28px;
+    border-radius: 6px;
+    flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px;
+    font-weight: 700;
+    font-family: 'Syne', sans-serif;
+  }
+
+  .msg.bot  .avatar { background: var(--primary); color: var(--accent); }
+  .msg.user .avatar { background: #f0f0f5; color: var(--text-muted); font-size: 12px; font-family: sans-serif; }
+
+  .bubble {
+    padding: 10px 14px;
+    font-size: 13.5px;
+    line-height: 1.65;
+    color: var(--text);
+  }
+
+  .msg.bot .bubble {
+    background: #f7f9fc;
+    border: 1px solid var(--border);
+    border-radius: 3px 12px 12px 12px;
+  }
+
+  .msg.user .bubble {
+    background: var(--primary);
+    color: #fff;
+    border-radius: 12px 3px 12px 12px;
+  }
+
+  /* source tag */
+  .source-tag {
+    display: inline-block;
+    margin-top: 7px;
+    font-size: 10.5px;
+    color: var(--accent);
+    background: #fff3e8;
+    border: 1px solid rgba(240,106,0,0.2);
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-weight: 500;
+  }
+
+  /* typing */
+  .typing-row {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    padding: 11px 14px;
+    background: #f7f9fc;
+    border: 1px solid var(--border);
+    border-radius: 3px 12px 12px 12px;
+    width: fit-content;
+  }
+
+  .typing-row span {
+    width: 6px; height: 6px;
+    background: var(--accent);
+    border-radius: 50%;
+    opacity: 0.4;
+    animation: bounce 1.2s infinite;
+  }
+
+  .typing-row span:nth-child(2) { animation-delay: 0.2s; }
+  .typing-row span:nth-child(3) { animation-delay: 0.4s; }
+
+  @keyframes bounce {
+    0%, 80%, 100% { transform: translateY(0); opacity: 0.4; }
+    40% { transform: translateY(-5px); opacity: 1; }
+  }
+
+  /* suggestions */
+  .suggestions {
+    padding: 10px 16px 8px;
+    display: flex;
+    gap: 7px;
+    flex-wrap: wrap;
+    border-top: 1px solid var(--border);
+    background: #fafbfd;
+  }
+
+  .suggestion-btn {
+    padding: 5px 11px;
+    font-family: 'IBM Plex Sans', sans-serif;
+    font-size: 11.5px;
+    font-weight: 500;
+    background: #fff;
+    border: 1px solid var(--border);
+    color: var(--primary);
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.18s;
+    white-space: nowrap;
+  }
+
+  .suggestion-btn:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+    background: #fff3e8;
+  }
+
+  /* input */
+  .input-bar {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 16px;
+    background: #fff;
+    border-top: 1px solid var(--border);
+  }
+
+  .input-bar input {
+    flex: 1;
+    padding: 10px 14px;
+    border: 1.5px solid var(--border);
+    border-radius: 8px;
+    font-family: 'IBM Plex Sans', sans-serif;
+    font-size: 13.5px;
+    color: var(--text);
+    background: var(--bg);
+    outline: none;
+    transition: border-color 0.2s;
+  }
+
+  .input-bar input:focus { border-color: var(--accent); }
+  .input-bar input::placeholder { color: var(--text-muted); }
+
+  .send-btn {
+    width: 38px; height: 38px;
+    border-radius: 8px;
+    background: var(--accent);
+    border: none;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: opacity 0.2s, transform 0.1s;
+    flex-shrink: 0;
+  }
+
+  .send-btn:hover  { opacity: 0.88; }
+  .send-btn:active { transform: scale(0.92); }
+  .send-btn svg    { width: 15px; height: 15px; fill: #fff; }
+
+  .powered {
+    margin-top: 14px;
+    font-size: 11px;
+    color: var(--text-muted);
+  }
+
+  .powered span { color: var(--accent); font-weight: 500; }
+</style>
+</head>
+<body>
+
+<!-- App Header -->
+<div class="app-header">
+  <div class="app-logo">
+    <div class="app-logo-mark" id="logoMark"></div>
+    <span class="app-logo-name" id="appName"></span>
+  </div>
+  <div class="app-badge">RAG-POWERED</div>
+</div>
+
+<!-- Document Card -->
+<div class="doc-card">
+  <div class="pdf-icon"></div>
+  <div class="doc-info">
+    <h2 id="docTitle"></h2>
+    <div class="doc-meta">
+      <span id="docPages"></span>
+      <span id="companyName"></span>
+      <span class="indexed">Document indexed</span>
+    </div>
+  </div>
+  <div class="rag-chip">RAG</div>
+</div>
+
+<!-- Chat -->
+<div class="chat-window">
+  <div class="messages" id="messages"></div>
+  <div class="suggestions" id="suggestionsRow"></div>
+  <div class="input-bar">
+    <input type="text" id="userInput" placeholder="Ask anything about this document…" autocomplete="off" />
+    <button class="send-btn" id="sendBtn" aria-label="Send">
+      <svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+    </button>
+  </div>
+</div>
+
+<p class="powered">Powered by <span>RAG Chatbot</span> · Built on Fiverr by KumailH12</p>
+
+<script>
+// Apply CONFIG
+document.documentElement.style.setProperty('--primary', CONFIG.colorPrimary);
+document.documentElement.style.setProperty('--accent', CONFIG.colorAccent);
+document.getElementById('logoMark').textContent = CONFIG.appName.slice(0,2);
+document.getElementById('appName').textContent = CONFIG.appName;
+document.getElementById('docTitle').textContent = CONFIG.documentTitle;
+document.getElementById('docPages').textContent = CONFIG.documentPages;
+document.getElementById('companyName').textContent = CONFIG.companyName;
+
+// Suggestions
+const suggestionsRow = document.getElementById('suggestionsRow');
+CONFIG.suggestions.forEach(text => {
+  const btn = document.createElement('button');
+  btn.className = 'suggestion-btn';
+  btn.textContent = text;
+  btn.onclick = () => sendMessage(text);
+  suggestionsRow.appendChild(btn);
+});
+
+const messagesEl = document.getElementById('messages');
+const inputEl    = document.getElementById('userInput');
+const sendBtnEl  = document.getElementById('sendBtn');
+
+let conversationHistory = [];
+
+function appendMessage(role, text, showSource) {
+  const wrap = document.createElement('div');
+  wrap.className = `msg ${role}`;
+
+  const avatar = document.createElement('div');
+  avatar.className = 'avatar';
+  avatar.textContent = role === 'bot' ? 'AI' : '👤';
+
+  const bubble = document.createElement('div');
+  bubble.className = 'bubble';
+  bubble.textContent = text;
+
+  if (role === 'bot' && showSource) {
+    const tag = document.createElement('div');
+    tag.className = 'source-tag';
+    tag.textContent = `📄 ${CONFIG.documentTitle}`;
+    bubble.appendChild(document.createElement('br'));
+    bubble.appendChild(tag);
+  }
+
+  wrap.appendChild(avatar);
+  wrap.appendChild(bubble);
+  messagesEl.appendChild(wrap);
+  messagesEl.scrollTop = messagesEl.scrollHeight;
+}
+
+function showTyping() {
+  const wrap = document.createElement('div');
+  wrap.className = 'msg bot';
+  wrap.id = 'typing';
+
+  const avatar = document.createElement('div');
+  avatar.className = 'avatar';
+  avatar.textContent = 'AI';
+
+  const dots = document.createElement('div');
+  dots.className = 'typing-row';
+  dots.innerHTML = '<span></span><span></span><span></span>';
+
+  wrap.appendChild(avatar);
+  wrap.appendChild(dots);
+  messagesEl.appendChild(wrap);
+  messagesEl.scrollTop = messagesEl.scrollHeight;
+}
+
+function removeTyping() {
+  const t = document.getElementById('typing');
+  if (t) t.remove();
+}
+
+async function sendMessage(text) {
+  const msg = (text || inputEl.value).trim();
+  if (!msg) return;
+
+  inputEl.value = '';
+  sendBtnEl.disabled = true;
+  suggestionsRow.style.display = 'none';
+
+  appendMessage('user', msg, false);
+  conversationHistory.push({ role: 'user', content: msg });
+  showTyping();
+
+  try {
+    const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${CONFIG.groqApiKey}`
+      },
+      body: JSON.stringify({
+        model: CONFIG.groqModel,
+        messages: [
+          { role: 'system', content: CONFIG.knowledgeBase.trim() },
+          ...conversationHistory
+        ],
+        temperature: 0.3,
+        max_tokens: 450
+      })
+    });
+
+    const data = await res.json();
+    removeTyping();
+
+    const reply = data?.choices?.[0]?.message?.content
+      || "I couldn't find that in the document. Please contact hr@horizonstech.pk.";
+    conversationHistory.push({ role: 'assistant', content: reply });
+    appendMessage('bot', reply, true);
+
+  } catch (err) {
+    removeTyping();
+    appendMessage('bot', "Something went wrong. Please try again.", false);
+    console.error(err);
+  }
+
+  sendBtnEl.disabled = false;
+  inputEl.focus();
+}
+
+window.addEventListener('load', () => {
+  setTimeout(() => appendMessage('bot', CONFIG.welcomeMessage, false), 500);
+});
+
+sendBtnEl.addEventListener('click', () => sendMessage());
+inputEl.addEventListener('keydown', e => { if (e.key === 'Enter') sendMessage(); });
+</script>
+</body>
+</html>

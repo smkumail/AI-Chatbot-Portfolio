@@ -1,0 +1,648 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>ManualAI — Product Assistant</title>
+
+<!-- ============================================================
+  CONFIG — Edit this block to customize for any product/client
+  ============================================================ -->
+<script>
+const CONFIG = {
+  // Branding
+  appName: "ManualAI",
+  productName: "ProCam X7 Pro",
+  productSubtitle: "4K Action Camera",
+  brandName: "VisionTech",
+  documentTitle: "ProCam X7 Pro — User Manual",
+  documentPages: "67 pages",
+
+  // Colors
+  colorPrimary: "#111111",
+  colorAccent: "#00c2a8",   // teal
+  colorBg: "#f2f4f5",
+
+  // Groq
+  groqApiKey: "YOUR_GROQ_API_KEY_HERE",
+  groqModel: "llama-3.1-8b-instant",
+
+  welcomeMessage: "Hey! I've read the full ProCam X7 Pro manual. Ask me about setup, settings, troubleshooting, battery life, or any feature — I'll find the answer instantly.",
+
+  suggestions: [
+    "How do I set up for the first time?",
+    "What is the max video resolution?",
+    "How long does the battery last?",
+    "How do I connect to the mobile app?"
+  ],
+
+  knowledgeBase: `
+You are ManualAI, an intelligent product assistant for the VisionTech ProCam X7 Pro action camera. You have fully read the 67-page user manual. Answer questions accurately and cite the relevant manual section when appropriate.
+
+---
+DOCUMENT: VisionTech ProCam X7 Pro — User Manual (67 pages)
+
+SECTION 1 — IN THE BOX
+- ProCam X7 Pro camera unit
+- Waterproof housing case (rated to 40m depth)
+- 1x rechargeable Li-ion battery (2,000mAh)
+- USB-C charging cable
+- Mounting adhesive (x2 flat, x2 curved)
+- Pivot arm mount + thumbscrew
+- Lens cloth
+- Quick Start Guide
+
+SECTION 2 — SPECIFICATIONS
+- Video resolution: 4K @ 60fps, 2.7K @ 120fps, 1080p @ 240fps
+- Photo resolution: 20MP (single), 15MP (burst), 12MP (time-lapse)
+- Field of view options: Wide (170°), Medium (120°), Narrow (65°), Linear
+- Stabilization: HyperSmooth 4.0 (electronic)
+- Display: 2.0" touch LCD (rear), 1.4" front display
+- Waterproof: 10m without housing, 40m with housing
+- Bluetooth 5.0, Wi-Fi 802.11ac (2.4GHz + 5GHz)
+- Storage: microSD up to 1TB (Class 10 / UHS-I recommended)
+- Battery: 2,000mAh — up to 90 min @ 4K/60fps, 140 min @ 1080p/60fps
+- Weight: 158g (without housing), 298g (with housing)
+- Dimensions: 71mm x 50mm x 33mm
+
+SECTION 3 — FIRST-TIME SETUP
+1. Charge the battery fully before first use (approx. 2 hours via USB-C)
+2. Insert a compatible microSD card (not included)
+3. Press and hold the Power button (top) for 3 seconds to turn on
+4. Select your language and region on the touch screen
+5. Set date and time (important for file timestamps)
+6. Download the VisionLink app (iOS / Android) for remote control and file transfer
+7. Pair via Bluetooth: Settings → Connections → Bluetooth → Enable → Open VisionLink app → Add Camera
+
+SECTION 4 — SHOOTING MODES
+- Video Mode: Standard, TimeWarp (time-lapse video), Slow-Mo, Live Streaming
+- Photo Mode: Single, Burst (up to 30fps), Night Photo, HDR
+- Time-lapse Mode: Photo, Video, StarTrail (long exposure)
+- Webcam Mode: connect via USB-C to use as 1080p/4K webcam
+- Voice Control: say "ProCam Start Recording", "ProCam Stop", "ProCam Take Photo"
+
+SECTION 5 — STABILIZATION & VIDEO SETTINGS
+- HyperSmooth 4.0: Auto, On, Boost (crops slightly), Off
+- Horizon Lock: keeps footage level even when camera rotates 360°
+- Bit rate: Standard (60Mbps) or High (100Mbps)
+- Color profiles: VisionColor (standard), Flat (for color grading), Natural, Vibrant
+- Audio: Stereo, Wind Reduction, RAW Audio (separate .wav file)
+- HDR Video: available at 4K/30fps and below
+
+SECTION 6 — BATTERY & CHARGING
+- Battery life: 90 min (4K/60fps), 140 min (1080p/60fps), 180 min (1080p/30fps)
+- Charge time: ~2 hours via USB-C (18W fast charge supported)
+- Battery percentage shown on front display and in VisionLink app
+- Low battery warning at 20%; auto-save and shutdown at 5%
+- Compatible with VisionTech Dual Battery Charger (sold separately)
+- Cold weather reduces battery life by up to 30% — keep camera warm before use
+
+SECTION 7 — CONNECTIVITY & APP
+- VisionLink App (free): remote preview, camera control, auto transfer, editing
+- Auto Highlight: AI selects best clips automatically
+- Live streaming: YouTube, Facebook Live via Wi-Fi (1080p/30fps max)
+- USB-C: file transfer, charging, webcam mode, external power
+- Bluetooth always-on mode: ~10% extra battery drain per hour
+
+SECTION 8 — WATERPROOFING & CARE
+- Camera is waterproof to 10m on its own — no housing needed for rain, pool, shallow water
+- Housing required for depths 10m–40m; inspect O-ring before every dive
+- Do not open camera doors while wet
+- Rinse with fresh water after salt water use
+- Avoid high-pressure water jets directly on ports
+
+SECTION 9 — TROUBLESHOOTING
+- Camera won't turn on: charge battery for 30 min, then try; try different USB cable
+- Footage is shaky: enable HyperSmooth, check that Boost mode is on
+- SD card not recognized: format card in-camera (Settings → SD Card → Format); use Class 10 or UHS-I card
+- App won't connect: disable mobile data, enable Wi-Fi on phone, restart camera Wi-Fi
+- Overheating warning: stop recording, remove from housing, let cool for 10 minutes
+- Screen frozen: hold Power + Mode buttons simultaneously for 10 seconds to hard reset
+
+SECTION 10 — WARRANTY & SUPPORT
+- 2-year limited warranty against manufacturing defects
+- Warranty void if opened, modified, or physically damaged
+- Support: support.visiontech.com | +1-800-VISION-1
+- Register product at visiontech.com/register for extended warranty (3 years)
+
+Always cite the relevant section (e.g., "According to Section 6 — Battery & Charging..."). Be concise and technically accurate. If a question is outside the manual, say so and direct to support.visiontech.com.
+  `
+};
+</script>
+<!-- ============================================================ -->
+
+<link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --primary: #111111;
+    --accent: #00c2a8;
+    --bg: #f2f4f5;
+    --surface: #ffffff;
+    --text: #0f0f0f;
+    --text-muted: #6e7a80;
+    --border: #e2e6e8;
+    --radius: 12px;
+  }
+
+  body {
+    font-family: 'Barlow', sans-serif;
+    background: var(--bg);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 24px 16px;
+    background-image:
+      radial-gradient(ellipse 70% 40% at 100% 0%, rgba(0,194,168,0.07) 0%, transparent 70%),
+      radial-gradient(ellipse 60% 40% at 0% 100%, rgba(0,0,0,0.04) 0%, transparent 70%);
+  }
+
+  /* ── Product Header ── */
+  .product-header {
+    width: 100%;
+    max-width: 520px;
+    background: var(--primary);
+    border-radius: var(--radius) var(--radius) 0 0;
+    overflow: hidden;
+  }
+
+  .product-top {
+    padding: 18px 20px 14px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+  }
+
+  .product-img {
+    width: 52px; height: 52px;
+    background: linear-gradient(135deg, #1e2a2a 0%, #0d1f1e 100%);
+    border: 1.5px solid rgba(0,194,168,0.3);
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 26px;
+    flex-shrink: 0;
+  }
+
+  .product-info {
+    flex: 1;
+  }
+
+  .brand-tag {
+    font-size: 10px;
+    font-weight: 600;
+    color: var(--accent);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    margin-bottom: 3px;
+  }
+
+  .product-info h1 {
+    font-size: 18px;
+    font-weight: 800;
+    color: #fff;
+    letter-spacing: -0.02em;
+    line-height: 1.1;
+  }
+
+  .product-info p {
+    font-size: 11px;
+    color: rgba(255,255,255,0.4);
+    margin-top: 3px;
+    font-weight: 400;
+  }
+
+  .rag-badge {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 5px;
+    flex-shrink: 0;
+  }
+
+  .rag-badge .badge {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    font-weight: 500;
+    padding: 3px 8px;
+    border-radius: 4px;
+    letter-spacing: 0.06em;
+  }
+
+  .badge.rag   { background: rgba(0,194,168,0.15); color: var(--accent); border: 1px solid rgba(0,194,168,0.25); }
+  .badge.live  { background: rgba(255,255,255,0.06); color: rgba(255,255,255,0.5); border: 1px solid rgba(255,255,255,0.1); display: flex; align-items: center; gap: 4px; }
+  .badge.live::before { content: ''; width: 5px; height: 5px; border-radius: 50%; background: #5dde7f; animation: blink 2s infinite; }
+
+  @keyframes blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.3; }
+  }
+
+  .doc-strip {
+    padding: 9px 20px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(255,255,255,0.03);
+  }
+
+  .doc-strip .doc-icon {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    font-weight: 500;
+    background: var(--accent);
+    color: #000;
+    padding: 2px 6px;
+    border-radius: 3px;
+    letter-spacing: 0.05em;
+  }
+
+  .doc-strip .doc-name {
+    font-size: 11px;
+    color: rgba(255,255,255,0.5);
+    font-weight: 400;
+  }
+
+  .doc-strip .doc-pages {
+    font-size: 11px;
+    color: rgba(255,255,255,0.25);
+    margin-left: auto;
+  }
+
+  .doc-strip .indexed {
+    font-size: 10px;
+    color: var(--accent);
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 3px;
+  }
+
+  /* ── Chat Window ── */
+  .chat-window {
+    width: 100%;
+    max-width: 520px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-top: none;
+    border-radius: 0 0 var(--radius) var(--radius);
+    display: flex;
+    flex-direction: column;
+    height: 510px;
+    overflow: hidden;
+    box-shadow: 0 12px 40px rgba(0,0,0,0.08);
+  }
+
+  /* Messages */
+  .messages {
+    flex: 1;
+    overflow-y: auto;
+    padding: 18px 16px 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    scroll-behavior: smooth;
+  }
+
+  .messages::-webkit-scrollbar { width: 3px; }
+  .messages::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+
+  .msg {
+    display: flex;
+    gap: 10px;
+    max-width: 92%;
+    animation: up 0.22s ease;
+  }
+
+  @keyframes up {
+    from { opacity: 0; transform: translateY(6px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .msg.user { align-self: flex-end; flex-direction: row-reverse; }
+  .msg.bot  { align-self: flex-start; }
+
+  .avatar {
+    width: 28px; height: 28px;
+    border-radius: 6px;
+    flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px;
+    font-weight: 700;
+    font-family: 'JetBrains Mono', monospace;
+  }
+
+  .msg.bot  .avatar { background: var(--primary); color: var(--accent); }
+  .msg.user .avatar { background: #e8ebec; color: var(--text-muted); font-size: 13px; font-family: sans-serif; }
+
+  .bubble {
+    padding: 10px 14px;
+    font-size: 13.5px;
+    line-height: 1.65;
+    color: var(--text);
+    font-weight: 400;
+  }
+
+  .msg.bot .bubble {
+    background: #f6f8f9;
+    border: 1px solid var(--border);
+    border-radius: 3px 12px 12px 12px;
+  }
+
+  .msg.user .bubble {
+    background: var(--primary);
+    color: #fff;
+    border-radius: 12px 3px 12px 12px;
+  }
+
+  .source-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    margin-top: 7px;
+    font-size: 10px;
+    color: var(--accent);
+    background: rgba(0,194,168,0.08);
+    border: 1px solid rgba(0,194,168,0.2);
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 500;
+  }
+
+  /* typing */
+  .typing-row {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    padding: 11px 14px;
+    background: #f6f8f9;
+    border: 1px solid var(--border);
+    border-radius: 3px 12px 12px 12px;
+    width: fit-content;
+  }
+
+  .typing-row span {
+    width: 6px; height: 6px;
+    background: var(--accent);
+    border-radius: 50%;
+    opacity: 0.4;
+    animation: tdot 1.2s infinite;
+  }
+
+  .typing-row span:nth-child(2) { animation-delay: 0.2s; }
+  .typing-row span:nth-child(3) { animation-delay: 0.4s; }
+
+  @keyframes tdot {
+    0%, 80%, 100% { transform: translateY(0); opacity: 0.4; }
+    40% { transform: translateY(-5px); opacity: 1; }
+  }
+
+  /* suggestions */
+  .suggestions {
+    padding: 10px 14px 8px;
+    display: flex;
+    gap: 7px;
+    flex-wrap: wrap;
+    border-top: 1px solid var(--border);
+    background: #fafbfc;
+  }
+
+  .suggestion-btn {
+    padding: 5px 11px;
+    font-family: 'Barlow', sans-serif;
+    font-size: 12px;
+    font-weight: 500;
+    background: #fff;
+    border: 1px solid var(--border);
+    color: var(--text);
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.18s;
+    white-space: nowrap;
+  }
+
+  .suggestion-btn:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+    background: rgba(0,194,168,0.05);
+  }
+
+  /* input */
+  .input-bar {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 14px;
+    background: #fff;
+    border-top: 1px solid var(--border);
+  }
+
+  .input-bar input {
+    flex: 1;
+    padding: 10px 14px;
+    border: 1.5px solid var(--border);
+    border-radius: 8px;
+    font-family: 'Barlow', sans-serif;
+    font-size: 14px;
+    color: var(--text);
+    background: var(--bg);
+    outline: none;
+    transition: border-color 0.2s;
+  }
+
+  .input-bar input:focus { border-color: var(--accent); }
+  .input-bar input::placeholder { color: var(--text-muted); font-weight: 400; }
+
+  .send-btn {
+    width: 38px; height: 38px;
+    border-radius: 8px;
+    background: var(--accent);
+    border: none;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: opacity 0.2s, transform 0.1s;
+    flex-shrink: 0;
+  }
+
+  .send-btn:hover  { opacity: 0.85; }
+  .send-btn:active { transform: scale(0.92); }
+  .send-btn svg    { width: 15px; height: 15px; fill: #000; }
+
+  .powered {
+    margin-top: 14px;
+    font-size: 11px;
+    color: var(--text-muted);
+  }
+
+  .powered span { color: var(--accent); font-weight: 600; }
+</style>
+</head>
+<body>
+
+<div class="product-header">
+  <div class="product-top">
+    <div class="product-img">📷</div>
+    <div class="product-info">
+      <div class="brand-tag" id="brandName"></div>
+      <h1 id="productName"></h1>
+      <p id="productSubtitle"></p>
+    </div>
+    <div class="rag-badge">
+      <div class="badge rag">RAG</div>
+      <div class="badge live">Online</div>
+    </div>
+  </div>
+  <div class="doc-strip">
+    <span class="doc-icon">PDF</span>
+    <span class="doc-name" id="docTitle"></span>
+    <span class="doc-pages" id="docPages"></span>
+    <span class="indexed">✓ Indexed</span>
+  </div>
+</div>
+
+<div class="chat-window">
+  <div class="messages" id="messages"></div>
+  <div class="suggestions" id="suggestionsRow"></div>
+  <div class="input-bar">
+    <input type="text" id="userInput" placeholder="Ask anything about this product…" autocomplete="off" />
+    <button class="send-btn" id="sendBtn" aria-label="Send">
+      <svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+    </button>
+  </div>
+</div>
+
+<p class="powered">Powered by <span>RAG Chatbot</span> · Built on Fiverr by KumailH12</p>
+
+<script>
+document.documentElement.style.setProperty('--primary', CONFIG.colorPrimary);
+document.documentElement.style.setProperty('--accent', CONFIG.colorAccent);
+document.getElementById('brandName').textContent = CONFIG.brandName;
+document.getElementById('productName').textContent = CONFIG.productName;
+document.getElementById('productSubtitle').textContent = CONFIG.productSubtitle;
+document.getElementById('docTitle').textContent = CONFIG.documentTitle;
+document.getElementById('docPages').textContent = CONFIG.documentPages;
+
+const suggestionsRow = document.getElementById('suggestionsRow');
+CONFIG.suggestions.forEach(text => {
+  const btn = document.createElement('button');
+  btn.className = 'suggestion-btn';
+  btn.textContent = text;
+  btn.onclick = () => sendMessage(text);
+  suggestionsRow.appendChild(btn);
+});
+
+const messagesEl = document.getElementById('messages');
+const inputEl    = document.getElementById('userInput');
+const sendBtnEl  = document.getElementById('sendBtn');
+
+let conversationHistory = [];
+
+function appendMessage(role, text, showSource) {
+  const wrap = document.createElement('div');
+  wrap.className = `msg ${role}`;
+
+  const avatar = document.createElement('div');
+  avatar.className = 'avatar';
+  avatar.textContent = role === 'bot' ? 'AI' : '👤';
+
+  const bubble = document.createElement('div');
+  bubble.className = 'bubble';
+  bubble.textContent = text;
+
+  if (role === 'bot' && showSource) {
+    bubble.appendChild(document.createElement('br'));
+    const tag = document.createElement('span');
+    tag.className = 'source-tag';
+    tag.textContent = `📄 ${CONFIG.documentTitle}`;
+    bubble.appendChild(tag);
+  }
+
+  wrap.appendChild(avatar);
+  wrap.appendChild(bubble);
+  messagesEl.appendChild(wrap);
+  messagesEl.scrollTop = messagesEl.scrollHeight;
+}
+
+function showTyping() {
+  const wrap = document.createElement('div');
+  wrap.className = 'msg bot';
+  wrap.id = 'typing';
+  const avatar = document.createElement('div');
+  avatar.className = 'avatar';
+  avatar.textContent = 'AI';
+  const dots = document.createElement('div');
+  dots.className = 'typing-row';
+  dots.innerHTML = '<span></span><span></span><span></span>';
+  wrap.appendChild(avatar);
+  wrap.appendChild(dots);
+  messagesEl.appendChild(wrap);
+  messagesEl.scrollTop = messagesEl.scrollHeight;
+}
+
+function removeTyping() {
+  const t = document.getElementById('typing');
+  if (t) t.remove();
+}
+
+async function sendMessage(text) {
+  const msg = (text || inputEl.value).trim();
+  if (!msg) return;
+
+  inputEl.value = '';
+  sendBtnEl.disabled = true;
+  suggestionsRow.style.display = 'none';
+
+  appendMessage('user', msg, false);
+  conversationHistory.push({ role: 'user', content: msg });
+  showTyping();
+
+  try {
+    const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${CONFIG.groqApiKey}`
+      },
+      body: JSON.stringify({
+        model: CONFIG.groqModel,
+        messages: [
+          { role: 'system', content: CONFIG.knowledgeBase.trim() },
+          ...conversationHistory
+        ],
+        temperature: 0.3,
+        max_tokens: 450
+      })
+    });
+
+    const data = await res.json();
+    removeTyping();
+
+    const reply = data?.choices?.[0]?.message?.content
+      || "I couldn't find that in the manual. Please visit support.visiontech.com.";
+    conversationHistory.push({ role: 'assistant', content: reply });
+    appendMessage('bot', reply, true);
+
+  } catch (err) {
+    removeTyping();
+    appendMessage('bot', "Something went wrong. Please try again.", false);
+    console.error(err);
+  }
+
+  sendBtnEl.disabled = false;
+  inputEl.focus();
+}
+
+window.addEventListener('load', () => {
+  setTimeout(() => appendMessage('bot', CONFIG.welcomeMessage, false), 500);
+});
+
+sendBtnEl.addEventListener('click', () => sendMessage());
+inputEl.addEventListener('keydown', e => { if (e.key === 'Enter') sendMessage(); });
+</script>
+</body>
+</html>
